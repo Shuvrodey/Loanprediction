@@ -1,0 +1,1252 @@
+https://colab.research.google.com/drive/1j9Q1s3Nvyc3fb6Msc9YKLAujmN2eQ279?usp=sharing
+
+
+ Loan.ipynb_
+1. Know Your Data
+Import Libraries
+
+[ ]
+# Import Libraries
+import io, pandas as pd, numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+Dataset Loading
+
+[ ]
+# Load Dataset
+from google.colab import files
+uploaded = files.upload()
+
+
+Dataset First View
+
+[ ]
+# Dataset First Look
+df = pd.read_csv(io.BytesIO(uploaded['loan_prediction.csv']))
+df.head()
+
+Dataset Rows & Columns count
+
+[ ]
+# Dataset Rows & Columns count
+df.shape
+(614, 13)
+Dataset Information
+
+[ ]
+# Dataset Info
+df.info()
+<class 'pandas.core.frame.DataFrame'>
+Index: 614 entries, 0 to 613
+Data columns (total 13 columns):
+ #   Column             Non-Null Count  Dtype  
+---  ------             --------------  -----  
+ 0   Loan_ID            614 non-null    object 
+ 1   Gender             601 non-null    object 
+ 2   Married            611 non-null    object 
+ 3   Dependents         599 non-null    object 
+ 4   Education          614 non-null    object 
+ 5   Self_Employed      582 non-null    object 
+ 6   ApplicantIncome    614 non-null    int64  
+ 7   CoapplicantIncome  614 non-null    float64
+ 8   LoanAmount         592 non-null    float64
+ 9   Loan_Amount_Term   600 non-null    float64
+ 10  Credit_History     564 non-null    float64
+ 11  Property_Area      614 non-null    object 
+ 12  Loan_Status        614 non-null    object 
+dtypes: float64(4), int64(1), object(8)
+memory usage: 67.2+ KB
+Duplicate Values
+
+[ ]
+# Dataset Duplicate Value Count
+df.duplicated().sum()
+
+np.int64(0)
+Missing Values/Null Values
+
+[ ]
+# Missing Values/Null Values Count
+df.isnull().sum()
+
+
+[ ]
+# Visualizing the missing values
+missing_counts = df.isnull().sum()
+plt.figure(figsize=(10, 6))
+sns.barplot(x=missing_counts.values, y=missing_counts.index, palette="viridis")
+plt.title("Missing Values per Column")
+plt.xlabel("Count of Missing Values")
+plt.ylabel("Columns")
+plt.show()
+
+What did you know about your dataset?
+1 cell hidden
+2. Understanding Your Variables
+
+[ ]
+# Dataset Columns
+df.columns.tolist()
+['Loan_ID',
+ 'Gender',
+ 'Married',
+ 'Dependents',
+ 'Education',
+ 'Self_Employed',
+ 'ApplicantIncome',
+ 'CoapplicantIncome',
+ 'LoanAmount',
+ 'Loan_Amount_Term',
+ 'Credit_History',
+ 'Property_Area',
+ 'Loan_Status']
+
+[ ]
+# Dataset Describe
+df.describe()
+
+Variables Description
+Answer Here
+
+Check Unique Values for each variable.
+
+[ ]
+# Check Unique Values for each variable.
+unique_values = df.nunique()
+unique_values
+
+3. Data Wrangling
+Data Wrangling Code
+
+[ ]
+# Write your code to make your dataset analysis ready.
+
+
+# --- Data Cleaning and Preprocessing ---
+
+print("\n--- Starting Data Wrangling ---")
+
+# Drop the 'Loan_ID' column as it is not useful for prediction
+df.drop('Loan_ID', axis=1, inplace=True)
+print("\nDropped 'Loan_ID' column.")
+
+# --- Handling Missing Values ---
+
+print("\nMissing values before handling:")
+print(df.isnull().sum())
+
+# Fill missing values in categorical columns with the mode
+categorical_cols_with_nan = ['Gender', 'Married', 'Dependents', 'Self_Employed', 'Credit_History']
+for col in categorical_cols_with_nan:
+    if df[col].isnull().sum() > 0:
+        mode_val = df[col].mode()[0]
+        df[col].fillna(mode_val, inplace=True)
+        print(f"Filled missing values in '{col}' with mode ('{mode_val}').")
+
+# Fill missing values in numerical columns with the mean
+numerical_cols_with_nan = ['LoanAmount', 'Loan_Amount_Term']
+for col in numerical_cols_with_nan:
+    if df[col].isnull().sum() > 0:
+        mean_val = df[col].mean()
+        df[col].fillna(mean_val, inplace=True)
+        print(f"Filled missing values in '{col}' with mean ({mean_val:.2f}).")
+
+print("\nMissing values after handling:")
+print(df.isnull().sum())
+
+
+--- Starting Data Wrangling ---
+
+Dropped 'Loan_ID' column.
+
+Missing values before handling:
+Gender               13
+Married               3
+Dependents           15
+Education             0
+Self_Employed        32
+ApplicantIncome       0
+CoapplicantIncome     0
+LoanAmount           22
+Loan_Amount_Term     14
+Credit_History       50
+Property_Area         0
+Loan_Status           0
+dtype: int64
+Filled missing values in 'Gender' with mode ('Male').
+Filled missing values in 'Married' with mode ('Yes').
+Filled missing values in 'Dependents' with mode ('0').
+Filled missing values in 'Self_Employed' with mode ('No').
+Filled missing values in 'Credit_History' with mode ('1.0').
+Filled missing values in 'LoanAmount' with mean (146.41).
+Filled missing values in 'Loan_Amount_Term' with mean (342.00).
+
+Missing values after handling:
+Gender               0
+Married              0
+Dependents           0
+Education            0
+Self_Employed        0
+ApplicantIncome      0
+CoapplicantIncome    0
+LoanAmount           0
+Loan_Amount_Term     0
+Credit_History       0
+Property_Area        0
+Loan_Status          0
+dtype: int64
+/tmp/ipython-input-2904667563.py:22: FutureWarning: A value is trying to be set on a copy of a DataFrame or Series through chained assignment using an inplace method.
+The behavior will change in pandas 3.0. This inplace method will never work because the intermediate object on which we are setting values always behaves as a copy.
+
+For example, when doing 'df[col].method(value, inplace=True)', try using 'df.method({col: value}, inplace=True)' or df[col] = df[col].method(value) instead, to perform the operation inplace on the original object.
+
+
+  df[col].fillna(mode_val, inplace=True)
+/tmp/ipython-input-2904667563.py:30: FutureWarning: A value is trying to be set on a copy of a DataFrame or Series through chained assignment using an inplace method.
+The behavior will change in pandas 3.0. This inplace method will never work because the intermediate object on which we are setting values always behaves as a copy.
+
+For example, when doing 'df[col].method(value, inplace=True)', try using 'df.method({col: value}, inplace=True)' or df[col] = df[col].method(value) instead, to perform the operation inplace on the original object.
+
+
+  df[col].fillna(mean_val, inplace=True)
+What all manipulations have you done and insights you found?
+1 cell hidden
+4. Data Vizualization, Storytelling & Experimenting with charts : Understand the relationships between variables
+Chart - 1
+
+[ ]
+# Chart - 1 visualization code
+plt.figure(figsize=(6, 5))
+sns.countplot(x='Loan_Status', data=df, palette='viridis')
+plt.title('1. Distribution of Loan Status')
+plt.xlabel('Loan Status (Y=Approved, N=Not Approved)')
+plt.ylabel('Count')
+plt.show()
+
+Chart - 2
+
+[ ]
+# Chart - 2 visualization code
+plt.figure(figsize=(7, 5))
+sns.countplot(x='Credit_History', hue='Loan_Status', data=df, palette='pastel')
+plt.title('2. Credit History vs. Loan Approval Status')
+plt.xlabel('Credit History (1=Has History, 0=No History)')
+plt.ylabel('Count')
+plt.xticks([0, 1], ['No', 'Yes'])
+plt.legend(title='Loan Approved')
+plt.show()
+
+
+Chart - 3
+
+[ ]
+# Chart - 3 visualization code
+
+# 3. Violin Plot: Applicant Income by Education
+plt.figure(figsize=(8, 6))
+sns.violinplot(x='Education', y='ApplicantIncome', data=df, palette='plasma')
+plt.title('3. Applicant Income Distribution by Education')
+plt.xlabel('Education Level')
+plt.ylabel('Applicant Income')
+plt.show()
+
+Chart - 4
+
+[ ]
+# Chart - 4 visualization code
+plt.figure(figsize=(10, 6))
+sns.scatterplot(x='ApplicantIncome', y='LoanAmount', hue='Loan_Status', data=df, alpha=0.6)
+plt.title('4. Applicant Income vs. Loan Amount')
+plt.xlabel('Applicant Income')
+plt.ylabel('Loan Amount')
+plt.legend(title='Loan Status')
+plt.show()
+
+
+Chart - 5
+
+[ ]
+
+# 5. KDE Plot: Loan Amount Distribution
+plt.figure(figsize=(8, 5))
+sns.kdeplot(df['LoanAmount'], shade=True, color='r')
+plt.title('5. Kernel Density Estimate of Loan Amount')
+plt.xlabel('Loan Amount')
+plt.ylabel('Density')
+plt.show()
+
+
+Chart - 6
+
+[ ]
+
+
+# 6. Bar Chart: Property Area vs. Loan Status
+plt.figure(figsize=(9, 6))
+sns.countplot(x='Property_Area', hue='Loan_Status', data=df, palette='magma')
+plt.title('6. Loan Approval Status by Property Area')
+plt.xlabel('Property Area')
+plt.ylabel('Count')
+plt.legend(title='Loan Approved')
+plt.show()
+
+Chart - 7
+
+[ ]
+# Chart - 7 visualization code
+plt.figure(figsize=(8, 6))
+sns.violinplot(x='Married', y='LoanAmount', hue='Loan_Status', data=df, split=True, palette='coolwarm')
+plt.title('7. Loan Amount by Marital Status and Loan Approval')
+plt.xlabel('Married')
+plt.ylabel('Loan Amount')
+plt.show()
+
+
+Chart - 8
+
+[ ]
+# Chart - 8 visualization code
+
+# 8. KDE Plot: Co-applicant Income Distribution
+plt.figure(figsize=(8, 5))
+# Filtering out zero incomes for a more meaningful plot
+coapplicant_income_filtered = df[df['CoapplicantIncome'] > 0]['CoapplicantIncome']
+sns.kdeplot(coapplicant_income_filtered, shade=True, color='b')
+plt.title('8. Kernel Density Estimate of Co-applicant Income (for > 0)')
+plt.xlabel('Co-applicant Income')
+plt.ylabel('Density')
+plt.show()
+
+
+Chart - 9
+
+[ ]
+# Chart - 9 visualization code
+# 9. Line Graph (Point Plot): Average Applicant Income by Number of Dependents
+plt.figure(figsize=(9, 6))
+sns.pointplot(x='Dependents', y='ApplicantIncome', data=df, ci=None, color='green')
+plt.title('9. Average Applicant Income by Number of Dependents')
+plt.xlabel('Number of Dependents')
+plt.ylabel('Average Applicant Income')
+plt.grid(True)
+plt.show()
+
+*** Chart - 10 - Correlation Heatmap***
+
+
+[ ]
+# Correlation Heatmap visualization code
+plt.figure(figsize=(12, 8))
+# Select only numeric columns for correlation matrix
+numeric_df = df.select_dtypes(include=np.number)
+correlation_matrix = numeric_df.corr()
+sns.heatmap(correlation_matrix, annot=True, cmap='viridis', fmt='.2f')
+plt.title('10. Correlation Matrix of Numerical Features')
+plt.show()
+
+
+Chart - 11 - Pair Plot
+
+[ ]
+# Pair Plot visualization code
+pair_plot_df = df[['ApplicantIncome', 'CoapplicantIncome', 'LoanAmount', 'Loan_Status']].copy()
+# To avoid issues with very large values skewing the plot, we can cap them
+pair_plot_df['ApplicantIncome'] = pair_plot_df['ApplicantIncome'].clip(upper=pair_plot_df['ApplicantIncome'].quantile(0.95))
+pair_plot_df['CoapplicantIncome'] = pair_plot_df['CoapplicantIncome'].clip(upper=pair_plot_df['CoapplicantIncome'].quantile(0.95))
+pair_plot_df['LoanAmount'] = pair_plot_df['LoanAmount'].clip(upper=pair_plot_df['LoanAmount'].quantile(0.95))
+
+sns.pairplot(pair_plot_df, hue='Loan_Status', palette='husl', diag_kind='kde')
+plt.suptitle('11. Pair Plot of Key Financial Features', y=1.02)
+plt.show()
+
+
+5. Hypothesis Testing
+Based on your chart experiments, define three hypothetical statements from the dataset. In the next three questions, perform hypothesis testing to obtain final conclusion about the statements through your code and statistical testing.
+** Hypothetical Statements** 1.Credit History and Loan Approval: Applicants who have a credit history are more likely to get their loan approved compared to those who do not.
+
+Education and Loan Amount: The average loan amount requested by 'Graduate' applicants is different from the average loan amount requested by 'Not Graduate' applicants.
+
+Marital Status and Income: Married applicants tend to have a higher average income than unmarried applicants.
+
+Hypothetical Statement - 1
+1. State Your research hypothesis as a null hypothesis and alternate hypothesis.
+Credit History and Loan Approval: Applicants who have a credit history are more likely to get their loan approved compared to those who do not.
+
+2. Perform an appropriate statistical test.
+
+[ ]
+# Perform Statistical Test to obtain P-Valuey
+# 1. Hypothesis: Credit History vs. Loan Approval
+from scipy.stats import chi2_contingency
+
+print("\n--- Hypothesis 1: Credit History vs. Loan Approval ---")
+print("H0: There is no association between Credit History and Loan Status.")
+print("H1: There is an association between Credit History and Loan Status.")
+contingency_table = pd.crosstab(df['Credit_History'], df['Loan_Status'])
+chi2, p, dof, expected = chi2_contingency(contingency_table)
+print(f"Chi-Square Statistic: {chi2:.4f}")
+print(f"P-value: {p:.4f}")
+
+# Define the significance level (alpha)
+alpha = 0.05
+
+if p < alpha:
+    print("Conclusion: Reject the null hypothesis. There is a significant association between credit history and loan approval.")
+else:
+    print("Conclusion: Fail to reject the null hypothesis. There is no significant association.")
+
+--- Hypothesis 1: Credit History vs. Loan Approval ---
+H0: There is no association between Credit History and Loan Status.
+H1: There is an association between Credit History and Loan Status.
+Chi-Square Statistic: 176.1146
+P-value: 0.0000
+Conclusion: Reject the null hypothesis. There is a significant association between credit history and loan approval.
+Hypothetical Statement - 2
+1. State Your research hypothesis as a null hypothesis and alternate hypothesis.
+Education and Loan Amount: The average loan amount requested by 'Graduate' applicants is different from the average loan amount requested by 'Not Graduate' applicants.
+
+2. Perform an appropriate statistical test.
+
+[ ]
+# Perform Statistical Test to obtain P-Value
+# 2. Hypothesis: Education vs. Loan Amount
+from scipy.stats import ttest_ind
+
+print("\n--- Hypothesis 2: Education vs. Loan Amount ---")
+print("H0: The mean loan amount is the same for Graduate and Not Graduate applicants.")
+print("H1: The mean loan amount is different for Graduate and Not Graduate applicants.")
+graduates = df[df['Education'] == 'Graduate']['LoanAmount']
+not_graduates = df[df['Education'] == 'Not Graduate']['LoanAmount']
+t_stat, p_val = ttest_ind(graduates, not_graduates, nan_policy='omit')
+print(f"T-statistic: {t_stat:.4f}")
+print(f"P-value: {p_val:.4f}")
+if p_val < alpha:
+    print("Conclusion: Reject the null hypothesis. There is a significant difference in the mean loan amount between graduates and non-graduates.")
+else:
+    print("Conclusion: Fail to reject the null hypothesis. There is no significant difference.")
+
+--- Hypothesis 2: Education vs. Loan Amount ---
+H0: The mean loan amount is the same for Graduate and Not Graduate applicants.
+H1: The mean loan amount is different for Graduate and Not Graduate applicants.
+T-statistic: 4.1901
+P-value: 0.0000
+Conclusion: Reject the null hypothesis. There is a significant difference in the mean loan amount between graduates and non-graduates.
+Hypothetical Statement - 3
+1. State Your research hypothesis as a null hypothesis and alternate hypothesis.
+Marital Status and Income: Married applicants tend to have a higher average income than unmarried applicants.
+
+2. Perform an appropriate statistical test.
+
+[ ]
+# Perform Statistical Test to obtain P-Value
+# 3. Hypothesis: Marital Status vs. Applicant Income
+print("\n--- Hypothesis 3: Marital Status vs. Applicant Income ---")
+print("H0: The mean applicant income of married individuals is less than or equal to that of unmarried individuals.")
+print("H1: The mean applicant income of married individuals is greater than that of unmarried individuals.")
+married = df[df['Married'] == 'Yes']['ApplicantIncome']
+not_married = df[df['Married'] == 'No']['ApplicantIncome']
+# We perform a one-tailed t-test. The p-value from ttest_ind is for a two-tailed test, so we divide by 2.
+t_stat_marital, p_val_marital = ttest_ind(married, not_married, nan_policy='omit', alternative='greater')
+print(f"T-statistic: {t_stat_marital:.4f}")
+print(f"P-value (one-tailed): {p_val_marital:.4f}")
+if p_val_marital < alpha:
+    print("Conclusion: Reject the null hypothesis. Married applicants have a significantly higher mean income.")
+else:
+    print("Conclusion: Fail to reject the null hypothesis. There is no significant evidence that married applicants have a higher mean income.")
+
+
+--- Hypothesis 3: Marital Status vs. Applicant Income ---
+H0: The mean applicant income of married individuals is less than or equal to that of unmarried individuals.
+H1: The mean applicant income of married individuals is greater than that of unmarried individuals.
+T-statistic: 1.2809
+P-value (one-tailed): 0.1004
+Conclusion: Fail to reject the null hypothesis. There is no significant evidence that married applicants have a higher mean income.
+6. Feature Engineering & Data Pre-processing
+2. Handling Outliers
+
+3 cells hidden
+3. Categorical Encoding
+
+[ ]
+# Encode your categorical columns
+for c in ["gender","married","education","self_employed"]:
+    if c in df.columns and df[c].dtype == "object":
+        df[c] = df[c].str.title()
+        le = LabelEncoder()
+        df[c] = le.fit_transform(df[c])
+
+# One-hot encode Property_Area (multi-class) if present
+if "property_area" in df.columns and df["property_area"].dtype == "object":
+    df["property_area"] = df["property_area"].str.title()
+    df = pd.get_dummies(df, columns=["property_area"], drop_first=True)
+4. Feature Manipulation & Selection
+1. Feature Manipulation
+
+[ ]
+# Manipulate Features to minimize feature correlation and create new features
+import re
+from sklearn.preprocessing import LabelEncoder
+
+def to_snake(s):
+    s = str(s).strip().lower()
+    s = re.sub(r'[^0-9a-zA-Z]+','_',s); s = re.sub(r'_+','_',s).strip('_')
+    return s
+df.columns = [to_snake(c) for c in df.columns]
+rename_map = {
+    "loanamount":"loan_amount","loan_amount_":"loan_amount","loan_ammount":"loan_amount",
+    "loanamountterm":"loan_amount_term","loan_amount_term_":"loan_amount_term",
+    "coapplicantincome":"coapplicant_income","applicantincome":"applicant_income",
+    "loanstatus":"loan_status","loan_id_":"loan_id","credit_history_":"credit_history"
+}
+df.rename(columns={k:v for k,v in rename_map.items() if k in df.columns}, inplace=True)
+
+# --- Target mapping if present (moved here) ---
+TARGET = "loan_status" # Ensure TARGET is defined before use
+if TARGET in df.columns and df[TARGET].dtype == "object":
+    df[TARGET] = df[TARGET].str.upper().map({"Y":1,"N":0})
+    print(f"Mapped '{TARGET}' column to 0 and 1.")
+elif TARGET in df.columns:
+    print(f"'{TARGET}' column is already numeric or not found.")
+else:
+    print(f"'{TARGET}' column not found in original dataframe.")
+
+
+# Coerce numerics where expected
+for c in ["applicant_income","coapplicant_income","loan_amount","loan_amount_term","credit_history","dependents"]:
+    if c in df.columns:
+        df[c] = pd.to_numeric(df[c], errors="coerce")
+if "dependents" in df.columns and df["dependents"].dtype == object:
+    df["dependents"] = df["dependents"].str.replace("+","",regex=False)
+    df["dependents"] = pd.to_numeric(df["dependents"], errors="coerce")
+
+# --- 4.1 Feature Manipulation (minimize correlation & create new features) ---
+# 1) Create domain features (safe-guard for missing cols)
+if all(c in df.columns for c in ["applicant_income","coapplicant_income"]):
+    df["total_income"] = df["applicant_income"].fillna(0) + df["coapplicant_income"].fillna(0)
+
+if all(c in df.columns for c in ["loan_amount","loan_amount_term"]):
+    # simple EMI proxy (no interest)
+    df["emi_approx"] = (df["loan_amount"] / df["loan_amount_term"]).replace([np.inf,-np.inf], np.nan)
+
+if "total_income" in df.columns and "emi_approx" in df.columns:
+    df["balance_income"] = df["total_income"] - df["emi_approx"]
+
+if all(c in df.columns for c in ["loan_amount","total_income"]):
+    df["loan_to_income"] = (df["loan_amount"] / df["total_income"]).replace([np.inf,-np.inf], np.nan)
+
+if all(c in df.columns for c in ["applicant_income","total_income"]):
+    df["applicant_income_share"] = (df["applicant_income"] / df["total_income"]).replace([np.inf,-np.inf], np.nan)
+
+if "dependents" in df.columns and "total_income" in df.columns:
+    df["income_per_capita"] = df["total_income"] / (1 + df["dependents"].fillna(0))
+
+# 2) Log-transform skewed numerics (reduces correlation & scale effects)
+for c in ["applicant_income","coapplicant_income","total_income","loan_amount","emi_approx","balance_income"]:
+    if c in df.columns:
+        df[c+"_log"] = np.log1p(df[c].clip(lower=0))
+
+# 3) Correlation-based pruning among numeric features (keep one from highly-correlated pairs)
+num_cols = df.select_dtypes(include=[np.number]).columns.tolist()
+num_cols_wo_target = [c for c in num_cols if c != TARGET] # Exclude TARGET from correlation analysis
+corr = df[num_cols_wo_target].corr().abs()
+
+# upper triangle mask
+upper = corr.where(np.triu(np.ones(corr.shape), k=1).astype(bool))
+HIGH = 0.90  # correlation threshold
+to_drop_corr = [column for column in upper.columns if any(upper[column] > HIGH)]
+# Don't drop engineered logs by default; prefer dropping raw if both exist
+protected = {c for c in num_cols_wo_target if c.endswith("_log")}
+to_drop_corr = [c for c in to_drop_corr if c not in protected]
+
+df_pruned = df.drop(columns=to_drop_corr, errors="ignore").copy() # Create a copy to avoid SettingWithCopyWarning
+'loan_status' column is already numeric or not found.
+2. Feature Selection
+
+[ ]
+# ======================================
+# Feature Selection (ONLY) — Colab-ready
+# - Supervised: Mutual Information (no model) + correlation pruning
+# - Unsupervised: VarianceThreshold + correlation pruning
+# - Handles basic impute + OneHot to compute features for selection
+# ======================================
+
+import numpy as np, pandas as pd
+from sklearn.impute import SimpleImputer
+from sklearn.preprocessing import OneHotEncoder
+from sklearn.compose import ColumnTransformer
+from sklearn.pipeline import Pipeline
+from sklearn.feature_selection import SelectKBest, mutual_info_classif, VarianceThreshold
+from scipy import sparse
+
+# ---------- helpers ----------
+def build_matrix(df, target=None):
+    """Impute + OneHot to produce numeric matrix and feature names."""
+    X = df.drop(columns=[target]) if (target and target in df.columns) else df.copy()
+    y = df[target].astype(int).values if (target and target in df.columns) else None
+
+    num_cols = X.select_dtypes(include=[np.number]).columns.tolist()
+    cat_cols = X.select_dtypes(include=["object","category","bool"]).columns.tolist()
+
+    num_pipe = Pipeline([("imp", SimpleImputer(strategy="median"))])
+    cat_pipe = Pipeline([("imp", SimpleImputer(strategy="most_frequent")),
+                         ("ohe", OneHotEncoder(handle_unknown="ignore", sparse=True))])
+
+    ct = ColumnTransformer([("num", num_pipe, num_cols),
+                            ("cat", cat_pipe, cat_cols)])
+    X_mat = ct.fit_transform(X)
+
+    # recover names
+    feat_names = []
+    # numeric names
+    feat_names += num_cols
+    # categorical OHE names
+    if cat_cols:
+        ohe = ct.named_transformers_["cat"].named_steps["ohe"]
+        feat_names += ohe.get_feature_names_out(cat_cols).tolist()
+
+    return X_mat, y, feat_names
+
+def correlation_prune(X_dense, names, threshold=0.90):
+    """Drop one from each pair of highly correlated features (Pearson)."""
+    # remove zero-variance columns
+    std = X_dense.std(axis=0)
+    keep = std > 1e-8
+    Xz = X_dense[:, keep]
+    names_z = [n for n,k in zip(names, keep) if k]
+
+    if Xz.shape[1] < 2:
+        return names_z, Xz
+
+    corr = np.corrcoef(Xz, rowvar=False)
+    to_drop = set()
+    for i in range(corr.shape[0]):
+        if names_z[i] in to_drop:
+            continue
+        high = np.where(np.abs(corr[i,(i+1):]) > threshold)[0]
+        for h in high:
+            j = i + 1 + h
+            to_drop.add(names_z[j])
+    selected_names = [n for n in names_z if n not in to_drop]
+    idx = [names_z.index(n) for n in selected_names]
+    X_sel = Xz[:, idx]
+    return selected_names, X_sel
+
+# ---------- main selectors ----------
+def feature_selection_supervised(df, target, mi_top_k=50, corr_threshold=0.90):
+    """With target: MI top-K then correlation pruning."""
+    X_mat, y, names = build_matrix(df, target)
+    X_dense = X_mat.toarray() if sparse.issparse(X_mat) else X_mat
+
+    mi = mutual_info_classif(X_dense, y, discrete_features=False, random_state=42)
+    order = np.argsort(-mi)[:min(mi_top_k, X_dense.shape[1])]
+    top_names = [names[i] for i in order]
+    X_top = X_dense[:, order]
+
+    selected_names, X_final = correlation_prune(X_top, top_names, threshold=corr_threshold)
+    return selected_names, X_final, y
+
+def feature_selection_unsupervised(df, var_threshold=1e-5, corr_threshold=0.90):
+    """No target: VarianceThreshold then correlation pruning."""
+    X_mat, _, names = build_matrix(df, target=None)
+    vt = VarianceThreshold(threshold=var_threshold)
+    X_vt = vt.fit_transform(X_mat)
+    names_vt = [n for n, m in zip(names, vt.get_support()) if m]
+    X_dense = X_vt.toarray() if sparse.issparse(X_vt) else X_vt
+
+    selected_names, X_final = correlation_prune(X_dense, names_vt, threshold=corr_threshold)
+    return selected_names, X_final
+
+# ---------- minimal usage ----------
+# df = pd.read_csv("loan_prediction.csv")
+# # If you have a target:
+# df["Loan_Status"] = df["Loan_Status"].map({"Y":1,"N":0})  # ensure numeric target
+# names_sup, X_sup, y = feature_selection_supervised(df, target="Loan_Status",
+#                                                    mi_top_k=50, corr_threshold=0.90)
+# print("Selected (supervised):", len(names_sup), names_sup)
+
+# # If you don't have a target yet:
+# names_unsup, X_unsup = feature_selection_unsupervised(df, var_threshold=1e-5, corr_threshold=0.90)
+# print("Selected (unsupervised):", len(names_unsup), names_unsup)
+
+5. Data Transformation
+Do you think that your data needs to be transformed? If yes, which transformation have you used. Explain Why?
+
+[ ]
+# Transform Your data
+# ============================
+# Data Transformation for Loan Prediction
+# ============================
+
+import pandas as pd, numpy as np
+from sklearn.preprocessing import StandardScaler, PowerTransformer
+from sklearn.impute import SimpleImputer
+
+# --- Load your dataset ---
+df = pd.read_csv("loan_prediction.csv")
+
+# --- Identify numeric & categorical columns ---
+num_cols = df.select_dtypes(include=[np.number]).columns.tolist()
+cat_cols = df.select_dtypes(include=["object","category","bool"]).columns.tolist()
+
+# --- 1. Handle missing values ---
+# Numeric → median, Categorical → most frequent
+df[num_cols] = SimpleImputer(strategy="median").fit_transform(df[num_cols])
+df[cat_cols] = SimpleImputer(strategy="most_frequent").fit_transform(df[cat_cols])
+
+# --- 2. Log transformation for skewed numeric features ---
+skew = df[num_cols].skew().sort_values(ascending=False)
+skewed = skew[abs(skew) > 0.75].index.tolist()
+
+for col in skewed:
+    if (df[col] >= 0).all():   # log1p only works for non-negative
+        df[col] = np.log1p(df[col])
+    else:                     # fallback: Yeo-Johnson
+        pt = PowerTransformer(method="yeo-johnson")
+        df[col] = pt.fit_transform(df[[col]])
+
+# --- 3. Scaling numeric features ---
+scaler = StandardScaler()
+df[num_cols] = scaler.fit_transform(df[num_cols])
+
+print("Data transformation complete.")
+print("Transformed shape:", df.shape)
+print("Sample:")
+print(df.head())
+
+Data transformation complete.
+Transformed shape: (614, 13)
+Sample:
+    Loan_ID Gender Married Dependents     Education Self_Employed  \
+0  LP001002   Male      No          0      Graduate            No   
+1  LP001003   Male     Yes          1      Graduate            No   
+2  LP001005   Male     Yes          0      Graduate           Yes   
+3  LP001006   Male     Yes          0  Not Graduate            No   
+4  LP001008   Male      No          0      Graduate            No   
+
+   ApplicantIncome  CoapplicantIncome  LoanAmount  Loan_Amount_Term  \
+0         0.516186          -1.107783   -0.012803          0.265985   
+1         0.137806           0.782158   -0.012803          0.265985   
+2        -0.519479          -1.107783   -1.348663          0.265985   
+3        -0.751605           0.897526   -0.143351          0.265985   
+4         0.555727          -1.107783    0.182981          0.265985   
+
+   Credit_History Property_Area Loan_Status  
+0        0.411733         Urban           Y  
+1        0.411733         Rural           N  
+2        0.411733         Urban           Y  
+3        0.411733         Urban           Y  
+4        0.411733         Urban           Y  
+6. Data Scaling
+
+[ ]
+# Scaling your data
+
+# --- Identify numeric columns ---
+num_cols = df.select_dtypes(include=['int64','float64']).columns.tolist()
+print("Numeric columns:", num_cols)
+
+# --- Standard Scaling (Z-score normalization) ---
+scaler = StandardScaler()
+df[num_cols] = scaler.fit_transform(df[num_cols])
+
+# --- (Optional) Min-Max Scaling ---
+# mm_scaler = MinMaxScaler()
+# df[num_cols] = mm_scaler.fit_transform(df[num_cols])
+
+print("Data scaling complete.")
+print("Scaled numeric sample:")
+print(df[num_cols].head())
+Numeric columns: ['ApplicantIncome', 'CoapplicantIncome', 'LoanAmount', 'Loan_Amount_Term', 'Credit_History']
+Data scaling complete.
+Scaled numeric sample:
+   ApplicantIncome  CoapplicantIncome  LoanAmount  Loan_Amount_Term  \
+0         0.516186          -1.107783   -0.012803          0.265985   
+1         0.137806           0.782158   -0.012803          0.265985   
+2        -0.519479          -1.107783   -1.348663          0.265985   
+3        -0.751605           0.897526   -0.143351          0.265985   
+4         0.555727          -1.107783    0.182981          0.265985   
+
+   Credit_History  
+0        0.411733  
+1        0.411733  
+2        0.411733  
+3        0.411733  
+4        0.411733  
+Which method have you used to scale you data and why?
+7. Dimesionality Reduction
+Do you think that dimensionality reduction is needed? Explain Why?
+Answer Here.
+
+
+[ ]
+# DImensionality Reduction (If needed)
+from sklearn.preprocessing import StandardScaler
+from sklearn.decomposition import PCA
+# --- Identify numeric columns ---
+num_cols = df.select_dtypes(include=['int64','float64']).columns.tolist()
+print("Numeric columns:", num_cols)
+
+# --- Scale numeric features before PCA ---
+scaler = StandardScaler()
+X_scaled = scaler.fit_transform(df[num_cols])
+
+# --- Apply PCA ---
+pca = PCA(n_components=5)   # choose number of components (e.g., 5)
+X_pca = pca.fit_transform(X_scaled)
+
+# --- Create DataFrame with PCA components ---
+pca_df = pd.DataFrame(X_pca, columns=[f"PC{i+1}" for i in range(X_pca.shape[1])])
+
+print("Explained variance ratio:", pca.explained_variance_ratio_)
+print("Cumulative variance explained:", pca.explained_variance_ratio_.sum())
+print("\nPCA-transformed shape:", pca_df.shape)
+print(pca_df.head())
+Numeric columns: ['ApplicantIncome', 'CoapplicantIncome', 'LoanAmount', 'Loan_Amount_Term', 'Credit_History']
+Explained variance ratio: [0.31163603 0.2304068  0.20129913 0.19419969 0.06245834]
+Cumulative variance explained: 1.0000000000000002
+
+PCA-transformed shape: (614, 5)
+        PC1       PC2       PC3       PC4       PC5
+0  0.770356 -0.810814  0.073593  0.672591 -0.159391
+1 -0.165744  0.631876  0.431917  0.190831  0.470627
+2 -0.763309 -1.425333 -0.122204  0.959668 -0.078070
+3 -0.936572  0.736866  0.401224  0.223838  0.007839
+4  0.912415 -0.709456  0.097384  0.635558 -0.246013
+Which dimensionality reduction technique have you used and why? (If dimensionality reduction done on dataset.)
+Answer Here.
+
+8. Data Splitting
+
+[ ]
+# Split your data to train and test. Choose Splitting ratio wisely.
+from sklearn.model_selection import train_test_split
+
+# --- Load dataset ---
+df = pd.read_csv("loan_prediction.csv")
+
+# --- Define features (X) and target (y) ---
+# Assuming target column is 'Loan_Status'
+X = df.drop(columns=['Loan_Status'])
+y = df['Loan_Status'].map({'Y':1, 'N':0})  # encode target
+
+# --- Split into train and test sets ---
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.2, random_state=42, stratify=y
+)
+
+print("Train set shape:", X_train.shape, y_train.shape)
+print("Test set shape :", X_test.shape, y_test.shape)
+Train set shape: (491, 12) (491,)
+Test set shape : (123, 12) (123,)
+7. ML Model Implementation
+ML Model - 1
+
+[ ]
+# =========================================
+# Fixed Logistic Regression (robust pipeline)
+# - Handles missing values & categorical encoding safely
+# - Avoids data leakage using ColumnTransformer + Pipeline
+# =========================================
+
+import pandas as pd
+import numpy as np
+
+from sklearn.model_selection import train_test_split
+from sklearn.compose import ColumnTransformer
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import OneHotEncoder, StandardScaler
+from sklearn.impute import SimpleImputer
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, roc_auc_score, confusion_matrix, RocCurveDisplay
+import matplotlib.pyplot as plt
+
+# --- Load ---
+df = pd.read_csv("loan_prediction.csv")
+
+# --- Target ---
+if "Loan_Status" not in df.columns:
+    raise ValueError("Target column 'Loan_Status' not found.")
+
+y = df["Loan_Status"]
+if y.dtype == object:
+    y = y.str.upper().map({"Y": 1, "N": 0})
+y = y.astype("int64")
+
+# --- Drop obvious ID columns if present ---
+for col in ["Loan_ID", "id", "ID"]:
+    if col in df.columns:
+        df.drop(columns=[col], inplace=True)
+
+X = df.drop(columns=["Loan_Status"])
+
+# --- Identify column types ---
+num_cols = X.select_dtypes(include=[np.number]).columns.tolist()
+cat_cols = X.select_dtypes(include=["object", "category", "bool"]).columns.tolist()
+
+# --- Preprocess ---
+numeric_pipe = Pipeline(steps=[
+    ("imputer", SimpleImputer(strategy="median")),
+    ("scaler", StandardScaler())
+])
+
+categorical_pipe = Pipeline(steps=[
+    ("imputer", SimpleImputer(strategy="most_frequent")),
+    ("ohe", OneHotEncoder(handle_unknown="ignore"))
+])
+
+preprocess = ColumnTransformer(
+    transformers=[
+        ("num", numeric_pipe, num_cols),
+        ("cat", categorical_pipe, cat_cols)
+    ],
+    remainder="drop"
+)
+
+# --- Split ---
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.2, random_state=42, stratify=y if y.nunique() > 1 else None
+)
+
+# --- Model ---
+clf = Pipeline(steps=[
+    ("prep", preprocess),
+    ("logreg", LogisticRegression(max_iter=2000, class_weight="balanced", n_jobs=None))
+])
+
+clf.fit(X_train, y_train)
+
+# --- Predict & Evaluate ---
+y_pred = clf.predict(X_test)
+if hasattr(clf.named_steps["logreg"], "predict_proba"):
+    y_prob = clf.predict_proba(X_test)[:, 1]
+else:
+    # fallback for solvers without predict_proba
+    try:
+        scores = clf.decision_function(X_test)
+        # scale to [0,1] for ROC-AUC
+        y_prob = (scores - scores.min()) / (scores.max() - scores.min() + 1e-12)
+    except:
+        y_prob = None
+
+print("Accuracy :", round(accuracy_score(y_test, y_pred), 4))
+print("Precision:", round(precision_score(y_test, y_pred), 4))
+print("Recall   :", round(recall_score(y_test, y_pred), 4))
+print("F1-score :", round(f1_score(y_test, y_pred), 4))
+if y_prob is not None:
+    print("ROC-AUC  :", round(roc_auc_score(y_test, y_prob), 4))
+print("\nConfusion Matrix:\n", confusion_matrix(y_test, y_pred))
+
+# --- Optional ROC curve ---
+if y_prob is not None:
+    RocCurveDisplay.from_estimator(clf, X_test, y_test)
+    plt.title("Logistic Regression ROC Curve")
+    plt.tight_layout()
+    plt.show()
+
+
+ML Model - 2
+1. Explain the ML Model used and it's performance using Evaluation metric Score Chart.
+
+[ ]
+# Visualizing evaluation Metric Score chart
+2. Cross- Validation & Hyperparameter Tuning
+
+[ ]
+# ML Model - 1 Implementation with hyperparameter optimization techniques (i.e., GridSearch CV, RandomSearch CV, Bayesian Optimization etc.)
+
+# Fit the Algorithm
+
+# Predict on the model
+# ============================================
+# Logistic Regression + Hyperparameter Optimization
+# - Clean preprocessing pipeline (impute + OHE + scale)
+# - GridSearchCV, RandomizedSearchCV, Bayesian (BayesSearchCV)
+# - Fits best model and predicts on test set
+# ============================================
+
+# If running in Colab, uncomment:
+# !pip -q install scikit-optimize
+
+import numpy as np, pandas as pd
+from sklearn.model_selection import train_test_split, StratifiedKFold, GridSearchCV, RandomizedSearchCV
+from sklearn.pipeline import Pipeline
+from sklearn.compose import ColumnTransformer
+from sklearn.preprocessing import OneHotEncoder, StandardScaler
+from sklearn.impute import SimpleImputer
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, roc_auc_score, confusion_matrix, classification_report
+
+# Optional: Bayesian optimization via scikit-optimize
+try:
+    from skopt import BayesSearchCV
+    from skopt.space import Real, Categorical
+    SKOPT_OK = True
+except Exception:
+    SKOPT_OK = False
+
+# ---- Load ----
+df = pd.read_csv("loan_prediction.csv")
+
+# ---- Target & Features ----
+y = df["Loan_Status"].map({"Y":1, "N":0}).astype("int64")
+X = df.drop(columns=["Loan_Status", "Loan_ID"], errors="ignore")
+
+# ---- Preprocess (numeric: median+scale, categorical: mode+OHE) ----
+num_cols = X.select_dtypes(include=[np.number]).columns.tolist()
+cat_cols = X.select_dtypes(include=["object","category","bool"]).columns.tolist()
+
+num_pipe = Pipeline([
+    ("imp", SimpleImputer(strategy="median")),
+    ("scaler", StandardScaler())
+])
+cat_pipe = Pipeline([
+    ("imp", SimpleImputer(strategy="most_frequent")),
+    ("ohe", OneHotEncoder(handle_unknown="ignore"))
+])
+
+preprocess = ColumnTransformer([
+    ("num", num_pipe, num_cols),
+    ("cat", cat_pipe, cat_cols)
+])
+
+base = Pipeline([
+    ("prep", preprocess),
+    ("clf", LogisticRegression(max_iter=5000, class_weight="balanced", solver="saga"))
+])
+
+# ---- Train/Test Split ----
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.2, stratify=y, random_state=42
+)
+
+cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
+scoring = "roc_auc"
+
+# ---- 1) GridSearchCV ----
+grid_params = {
+    "clf__penalty": ["l1", "l2", "elasticnet"],
+    "clf__C": [0.01, 0.1, 1.0, 3.0, 10.0],
+    "clf__l1_ratio": [0.0, 0.25, 0.5, 0.75, 1.0]  # used only when penalty='elasticnet'
+}
+grid = GridSearchCV(
+    estimator=base,
+    param_grid=grid_params,
+    scoring=scoring,
+    cv=cv,
+    n_jobs=-1,
+    refit=True
+)
+grid.fit(X_train, y_train)
+print("\n=== GridSearchCV ===")
+print("Best ROC-AUC (cv):", round(grid.best_score_, 4))
+print("Best Params:", grid.best_params_)
+
+# ---- 2) RandomizedSearchCV ----
+from scipy.stats import loguniform, uniform
+random_params = {
+    "clf__penalty": ["l1", "l2", "elasticnet"],
+    "clf__C": loguniform(1e-3, 1e2),
+    "clf__l1_ratio": uniform(0, 1)  # ignored unless elasticnet
+}
+rsearch = RandomizedSearchCV(
+    estimator=base,
+    param_distributions=random_params,
+    n_iter=40,
+    scoring=scoring,
+    cv=cv,
+    random_state=42,
+    n_jobs=-1,
+    refit=True
+)
+rsearch.fit(X_train, y_train)
+print("\n=== RandomizedSearchCV ===")
+print("Best ROC-AUC (cv):", round(rsearch.best_score_, 4))
+print("Best Params:", rsearch.best_params_)
+
+# ---- 3) Bayesian Optimization (BayesSearchCV) ----
+if SKOPT_OK:
+    bayes_space = {
+        "clf__penalty": Categorical(["l1", "l2", "elasticnet"]),
+        "clf__C": Real(1e-3, 1e2, prior="log-uniform"),
+        "clf__l1_ratio": Real(0.0, 1.0)  # active only for elasticnet
+    }
+    bayes = BayesSearchCV(
+        estimator=base,
+        search_spaces=bayes_space,
+        n_iter=40,
+        scoring=scoring,
+        cv=cv,
+        n_jobs=-1,
+        random_state=42,
+        refit=True
+    )
+    bayes.fit(X_train, y_train)
+    print("\n=== BayesSearchCV ===")
+    print("Best ROC-AUC (cv):", round(bayes.best_score_, 4))
+    print("Best Params:", bayes.best_params_)
+else:
+    bayes = None
+    print("\n(skopt not available — skipping BayesSearchCV)")
+
+# ---- Pick the best search by CV score ----
+candidates = [
+    ("grid", grid.best_score_, grid.best_estimator_),
+    ("random", rsearch.best_score_, rsearch.best_estimator_),
+]
+if bayes is not None:
+    candidates.append(("bayes", bayes.best_score_, bayes.best_estimator_))
+
+winner_name, winner_score, best_model = max(candidates, key=lambda t: t[1])
+print(f"\n>>> Selected best via CV: {winner_name.upper()} (ROC-AUC={winner_score:.4f})")
+
+# ---- Fit the Algorithm on full training (already refit=True) ----
+# 'best_model' is already fit; proceed to predict
+
+# ---- Predict on the model ----
+y_pred = best_model.predict(X_test)
+y_prob = best_model.predict_proba(X_test)[:, 1]
+
+# ---- Evaluation ----
+print("\n=== Test Metrics (Best Model) ===")
+print("Accuracy :", round(accuracy_score(y_test, y_pred), 4))
+print("Precision:", round(precision_score(y_test, y_pred), 4))
+print("Recall   :", round(recall_score(y_test, y_pred), 4))
+print("F1-score :", round(f1_score(y_test, y_pred), 4))
+print("ROC-AUC  :", round(roc_auc_score(y_test, y_prob), 4))
+print("\nConfusion Matrix:\n", confusion_matrix(y_test, y_pred))
+print("\nClassification Report:\n", classification_report(y_test, y_pred))
+
+/usr/local/lib/python3.12/dist-packages/sklearn/linear_model/_logistic.py:1196: UserWarning: l1_ratio parameter is only used when penalty is 'elasticnet'. Got (penalty=l2)
+  warnings.warn(
+
+=== GridSearchCV ===
+Best ROC-AUC (cv): 0.728
+Best Params: {'clf__C': 0.1, 'clf__l1_ratio': 0.0, 'clf__penalty': 'l2'}
+
+=== RandomizedSearchCV ===
+Best ROC-AUC (cv): 0.7295
+Best Params: {'clf__C': np.float64(0.09984006580328653), 'clf__l1_ratio': np.float64(0.04666566321361543), 'clf__penalty': 'elasticnet'}
+
+(skopt not available — skipping BayesSearchCV)
+
+>>> Selected best via CV: RANDOM (ROC-AUC=0.7295)
+
+=== Test Metrics (Best Model) ===
+Accuracy : 0.8537
+Precision: 0.8681
+Recall   : 0.9294
+F1-score : 0.8977
+ROC-AUC  : 0.8548
+
+Confusion Matrix:
+ [[26 12]
+ [ 6 79]]
+
+Classification Report:
+               precision    recall  f1-score   support
+
+           0       0.81      0.68      0.74        38
+           1       0.87      0.93      0.90        85
+
+    accuracy                           0.85       123
+   macro avg       0.84      0.81      0.82       123
+weighted avg       0.85      0.85      0.85       123
+
+ML Model - 3
+
+[ ]
+# ML Model - 3 Implementation
+
+# Fit the Algorithm
+
+# Predict on the model
+# ============================
+# Random Forest for Loan Prediction
+# ============================
+
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.compose import ColumnTransformer
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import OneHotEncoder, StandardScaler
+from sklearn.impute import SimpleImputer
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, roc_auc_score, confusion_matrix
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+# --- Load dataset ---
+df = pd.read_csv("loan_prediction.csv")
+
+# --- Target ---
+y = df["Loan_Status"].map({"Y": 1, "N": 0}).astype("int64")
+X = df.drop(columns=["Loan_Status", "Loan_ID"], errors="ignore")
+
+# --- Identify column types ---
+num_cols = X.select_dtypes(include=["int64","float64"]).columns.tolist()
+cat_cols = X.select_dtypes(include=["object","category","bool"]).columns.tolist()
+
+# --- Preprocessing ---
+num_pipe = Pipeline(steps=[
+    ("imputer", SimpleImputer(strategy="median")),
+    ("scaler", StandardScaler())
+])
+
+cat_pipe = Pipeline(steps=[
+    ("imputer", SimpleImputer(strategy="most_frequent")),
+    ("ohe", OneHotEncoder(handle_unknown="ignore"))
+])
+
+preprocess = ColumnTransformer(
+    transformers=[
+        ("num", num_pipe, num_cols),
+        ("cat", cat_pipe, cat_cols)
+    ],
+    remainder="drop"
+)
+
+# --- Train-test split ---
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.2, random_state=42, stratify=y
+)
+
+# --- Random Forest Model ---
+rf = Pipeline(steps=[
+    ("prep", preprocess),
+    ("rf", RandomForestClassifier(
+        n_estimators=300,
+        max_depth=None,
+        random_state=42,
+        class_weight="balanced_subsample"
+    ))
+])
+
+rf.fit(X_train, y_train)
+
+# --- Predictions ---
+y_pred = rf.predict(X_test)
+y_prob = rf.predict_proba(X_test)[:, 1]
+
+# --- Evaluation ---
+print("Accuracy :", round(accuracy_score(y_test, y_pred), 4))
+print("Precision:", round(precision_score(y_test, y_pred), 4))
+print("Recall   :", round(recall_score(y_test, y_pred), 4))
+print("F1-score :", round(f1_score(y_test, y_pred), 4))
+print("ROC-AUC  :", round(roc_auc_score(y_test, y_prob), 4))
+print("\nConfusion Matrix:\n", confusion_matrix(y_test, y_pred))
+
+# --- Feature Importance (top 15) ---
+feature_names = rf.named_steps["prep"].get_feature_names_out()
+importances = rf.named_steps["rf"].feature_importances_
+
+feat_imp = pd.DataFrame({"feature": feature_names, "importance": importances})
+feat_imp = feat_imp.sort_values("importance", ascending=False).head(15)
+
+plt.figure(figsize=(8,5))
+sns.barplot(x="importance", y="feature", data=feat_imp)
+plt.title("Top 15 Feature Importances (Random Forest)")
+plt.tight_layout()
+plt.show()
+
+
+Colab paid products - Cancel contracts here
